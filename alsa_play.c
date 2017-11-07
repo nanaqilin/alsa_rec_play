@@ -167,18 +167,20 @@ int set_pcm_play(FILE *fp)
 
     while (1)
         {
-                memset(buffer,0,sizeof(buffer));
-                ret = fread(buffer, 1, size, fp);
-                if(ret == 0)
+                int length;
+
+                memset(buffer,0,size);
+                length = fread(buffer, 1, size, fp);
+                if(length == 0)
                 {
                         printf("歌曲写入结束\n");
                         break;
                 }
-                 else if (ret != size)
+                 else if (length != size)
                 {
                  }
                 // 写音频数据到PCM设备 
-        while(ret = snd_pcm_writei(handle, buffer, frames)<0)
+        while(ret = snd_pcm_writei(handle, buffer, length)<0)
            {
                  usleep(2000); 
                  if (ret == -EPIPE)
@@ -194,6 +196,7 @@ int set_pcm_play(FILE *fp)
                       "error from writei: %s\n",
                       snd_strerror(ret));
                  }
+                 length -= ret;
             }
 
     }
